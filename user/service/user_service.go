@@ -29,10 +29,29 @@ func NewUserService(userRepository entity.UserRepository, followRepository entit
 	}
 }
 
-// getTokenString generates token for a specific user.
-func getTokenString(id int64) string {
-	token, _ := json.Marshal(&Token{ID: id, UUID: core.GetUUID()})
-	return base64.URLEncoding.EncodeToString(token)
+// GenerateToken generates the token for specific user.
+func GenerateToken(id int64) Token {
+	return Token{ID: id, UUID: core.GetUUID()}
+}
+
+// EncodeToken encode the token to string.
+func EncodeToken(token Token) string {
+	s, _ := json.Marshal(&token)
+	return base64.URLEncoding.EncodeToString(s)
+}
+
+// DecodeToken decode the string to user token
+func DecodeToken(s string) (Token, error) {
+	token := Token{}
+	decoded, err := base64.URLEncoding.DecodeString(s)
+	if err != nil {
+		return token, err
+	}
+	err = json.Unmarshal(decoded, &token)
+	if err != nil {
+		return token, err
+	}
+	return token, nil
 }
 
 func (u *UserServiceImpl) Register(username string, password string) (*entity.UserLoginToken, error) {
@@ -83,12 +102,13 @@ func (u *UserServiceImpl) Login(username string, password string) (*entity.UserL
 		return &entity.UserLoginToken{ID: user.ID, Token: *user.Token}, nil
 	}
 
-	token := getTokenString(user.ID)
-	if err := u.userRepository.UpdateTokenByID(user.ID, token); err != nil {
+	token := GenerateToken(user.ID)
+	tokenString := EncodeToken(token)
+	if err := u.userRepository.UpdateTokenByID(user.ID, tokenString); err != nil {
 		log.Printf("Login(...): %s\n", errors.Details(err))
 		return nil, core.ErrInternalServerError
 	}
-	return &entity.UserLoginToken{ID: user.ID, Token: token}, nil
+	return &entity.UserLoginToken{ID: user.ID, Token: tokenString}, nil
 }
 
 func (u *UserServiceImpl) GetUsername(id int64) (string, error) {

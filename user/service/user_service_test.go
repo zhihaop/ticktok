@@ -43,7 +43,13 @@ func TestUserServiceImpl_Login(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	id, err := userService.GetUserID(tokenLogin.Token)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	assert.Equal(t, tokenRegister, tokenLogin)
+	assert.Equal(t, id, tokenLogin.ID)
 	t.Logf("login success, id: %d, token: %s", tokenLogin.ID, tokenLogin.Token)
 }
 
