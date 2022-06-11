@@ -22,7 +22,7 @@ func NewFollowRepository(db *gorm.DB) entity.FollowRepository {
 
 func (f *FollowRepositoryImpl) CountFollowerByID(followID int64) (int64, error) {
 	followerCount := int64(0)
-	db := f.db.Where("followID = ?", followID).Count(&followerCount)
+	db := f.db.Model(&entity.Follow{}).Where("follow_id = ?", followID).Count(&followerCount)
 	if db.Error != nil {
 		return -1, db.Error
 	}
@@ -32,7 +32,7 @@ func (f *FollowRepositoryImpl) CountFollowerByID(followID int64) (int64, error) 
 
 func (f *FollowRepositoryImpl) CountFollowByID(followerID int64) (int64, error) {
 	followCount := int64(0)
-	db := f.db.Where("followerID = ?", followerID).Count(&followCount)
+	db := f.db.Model(&entity.Follow{}).Where("follower_id = ?", followerID).Count(&followCount)
 	if db.Error != nil {
 		return -1, db.Error
 	}
@@ -64,7 +64,7 @@ func (f *FollowRepositoryImpl) DeleteFollow(followerID int64, followID int64) er
 
 func (f *FollowRepositoryImpl) HasFollow(followerID int64, followID int64) (bool, error) {
 	count := int64(0)
-	db := f.db.Where("followerID = ? AND followID = ?", followerID, followID).Count(&count)
+	db := f.db.Model(&entity.Follow{}).Where("follower_id = ? AND follow_id = ?", followerID, followID).Count(&count)
 	if db.Error != nil {
 		return false, db.Error
 	}

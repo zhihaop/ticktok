@@ -1,9 +1,11 @@
 package service
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"github.com/zhihaop/ticktok/core"
 	"github.com/zhihaop/ticktok/entity"
+	"gopkg.in/errgo.v2/errors"
 	"log"
 )
 
@@ -30,7 +32,7 @@ func NewUserService(userRepository entity.UserRepository, followRepository entit
 // getTokenString generates token for a specific user.
 func getTokenString(id int64) string {
 	token, _ := json.Marshal(&Token{ID: id, UUID: core.GetUUID()})
-	return string(token)
+	return base64.URLEncoding.EncodeToString(token)
 }
 
 func (u *UserServiceImpl) Register(username string, password string) (*entity.UserLoginToken, error) {
@@ -45,7 +47,7 @@ func (u *UserServiceImpl) Register(username string, password string) (*entity.Us
 
 	user, err := u.userRepository.FindByUsername(username)
 	if err != nil {
-		log.Println(err)
+		log.Printf("Register(...): %s\n", errors.Details(err))
 		return nil, core.ErrInternalServerError
 	}
 
@@ -56,7 +58,7 @@ func (u *UserServiceImpl) Register(username string, password string) (*entity.Us
 	salt := core.GetUUID()
 	encoded := core.Encoded(password, salt)
 	if err := u.userRepository.CreateUser(username, encoded, salt); err != nil {
-		log.Println(err)
+		log.Printf("Register(...): %s\n", errors.Details(err))
 		return nil, core.ErrInternalServerError
 	}
 	return u.Login(username, password)
@@ -65,7 +67,7 @@ func (u *UserServiceImpl) Register(username string, password string) (*entity.Us
 func (u *UserServiceImpl) Login(username string, password string) (*entity.UserLoginToken, error) {
 	user, err := u.userRepository.FindByUsername(username)
 	if err != nil {
-		log.Println(err)
+		log.Printf("Login(...): %s\n", errors.Details(err))
 		return nil, core.ErrInternalServerError
 	}
 
@@ -83,7 +85,7 @@ func (u *UserServiceImpl) Login(username string, password string) (*entity.UserL
 
 	token := getTokenString(user.ID)
 	if err := u.userRepository.UpdateTokenByID(user.ID, token); err != nil {
-		log.Println(err)
+		log.Printf("Login(...): %s\n", errors.Details(err))
 		return nil, core.ErrInternalServerError
 	}
 	return &entity.UserLoginToken{ID: user.ID, Token: token}, nil
@@ -92,7 +94,7 @@ func (u *UserServiceImpl) Login(username string, password string) (*entity.UserL
 func (u *UserServiceImpl) GetUsername(id int64) (string, error) {
 	user, err := u.userRepository.FindByID(id)
 	if err != nil {
-		log.Println(err)
+		log.Printf("GetUsername(...): %s\n", errors.Details(err))
 		return "", core.ErrInternalServerError
 	}
 
@@ -105,7 +107,7 @@ func (u *UserServiceImpl) GetUsername(id int64) (string, error) {
 func (u *UserServiceImpl) GetFollowerCount(id int64) (int64, error) {
 	followerCount, err := u.followRepository.CountFollowerByID(id)
 	if err != nil {
-		log.Println(err)
+		log.Printf("GetFollowerCount(...): %s\n", errors.Details(err))
 		return 0, core.ErrInternalServerError
 	}
 	return followerCount, nil
@@ -114,7 +116,7 @@ func (u *UserServiceImpl) GetFollowerCount(id int64) (int64, error) {
 func (u *UserServiceImpl) GetFollowCount(id int64) (int64, error) {
 	followingCount, err := u.followRepository.CountFollowByID(id)
 	if err != nil {
-		log.Println(err)
+		log.Printf("GetFollowCount(...): %s\n", errors.Details(err))
 		return 0, core.ErrInternalServerError
 	}
 	return followingCount, nil
@@ -123,7 +125,7 @@ func (u *UserServiceImpl) GetFollowCount(id int64) (int64, error) {
 func (u *UserServiceImpl) GetUserID(token string) (int64, error) {
 	user, err := u.userRepository.FindByToken(token)
 	if err != nil {
-		log.Println(err)
+		log.Printf("GetUserID(...): %s\n", errors.Details(err))
 		return 0, core.ErrInternalServerError
 	}
 
@@ -140,7 +142,7 @@ func (u *UserServiceImpl) IsFollow(followerID int64, followID int64) (bool, erro
 
 	isFollow, err := u.followRepository.HasFollow(followerID, followID)
 	if err != nil {
-		log.Println(err)
+		log.Printf("IsFollow(...): %s\n", errors.Details(err))
 		return false, core.ErrInternalServerError
 	}
 	return isFollow, nil

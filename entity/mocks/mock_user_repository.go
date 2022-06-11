@@ -10,7 +10,7 @@ import (
 
 // MockUserRepository provides a mock repository for UserRepository
 type MockUserRepository struct {
-	repo entity.UserRepository
+	entity.UserRepository
 }
 
 func NewMockUserRepository() entity.UserRepository {
@@ -18,26 +18,6 @@ func NewMockUserRepository() entity.UserRepository {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	mock := &MockUserRepository{repo: repository.NewUserRepository(db)}
+	mock := &MockUserRepository{repository.NewUserRepository(db)}
 	return mock
-}
-
-func (m *MockUserRepository) CreateUser(username string, password string, salt string) error {
-	return m.repo.CreateUser(username, password, salt)
-}
-
-func (m *MockUserRepository) UpdateTokenByID(id int64, token string) error {
-	return m.repo.UpdateTokenByID(id, token)
-}
-
-func (m *MockUserRepository) FindByUsername(username string) (*entity.User, error) {
-	return m.repo.FindByUsername(username)
-}
-
-func (m *MockUserRepository) FindByID(id int64) (*entity.User, error) {
-	return m.repo.FindByID(id)
-}
-
-func (m *MockUserRepository) FindByToken(token string) (*entity.User, error) {
-	return m.repo.FindByToken(token)
 }

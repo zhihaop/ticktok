@@ -25,9 +25,9 @@ type UserInfoResponse struct {
 	core.Response
 	ID            int64  `json:"id,omitempty"`
 	Name          string `json:"name,omitempty"`
-	FollowCount   int64  `json:"follow_count,omitempty"`
-	FollowerCount int64  `json:"follower_count,omitempty"`
-	IsFollow      bool   `json:"is_follow,omitempty"`
+	FollowCount   int64  `json:"follow_count"`
+	FollowerCount int64  `json:"follower_count"`
+	IsFollow      bool   `json:"is_follow"`
 }
 
 // NewUserController creates an instance of UserController
@@ -92,7 +92,7 @@ func (u *UserController) Info(c *gin.Context) {
 		return
 	}
 
-	username, err := u.UserService.GetUsername(userID)
+	username, err := u.UserService.GetUsername(id)
 	if err != nil {
 		c.JSON(http.StatusOK, core.ResponseError(err))
 		return
