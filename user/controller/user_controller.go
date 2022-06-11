@@ -6,11 +6,7 @@ import (
 	"github.com/zhihaop/ticktok/entity"
 	"net/http"
 	"strconv"
-	"sync"
 )
-
-// initOnce purpose to register handlers once
-var initOnce sync.Once
 
 // UserController handles all the request mapping to '/douyin/user'
 type UserController struct {
@@ -34,15 +30,16 @@ type UserInfoResponse struct {
 	IsFollow      bool   `json:"is_follow,omitempty"`
 }
 
-// RegisterUserController creates an instance of UserController and register handlers to gin.RouterGroup
-func RegisterUserController(g *gin.RouterGroup, userService entity.UserService) {
-	initOnce.Do(func() {
-		controller := &UserController{UserService: userService}
+// NewUserController creates an instance of UserController
+func NewUserController(userService entity.UserService) *UserController {
+	return &UserController{UserService: userService}
+}
 
-		g.POST("/register", controller.Register)
-		g.POST("/login", controller.Login)
-		g.POST("/", controller.Info)
-	})
+// InitRouter register handlers to gin.RouterGroup
+func (u *UserController) InitRouter(g *gin.RouterGroup) {
+	g.POST("/register", u.Register)
+	g.POST("/login", u.Login)
+	g.POST("/", u.Info)
 }
 
 func (u *UserController) Register(c *gin.Context) {

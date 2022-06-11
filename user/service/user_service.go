@@ -74,7 +74,6 @@ func (u *UserServiceImpl) Login(username string, password string) (*entity.UserL
 	}
 
 	if core.Encoded(password, user.Salt) != user.Password {
-
 		return nil, core.ErrUsernameOrPasswordInvalid
 	}
 

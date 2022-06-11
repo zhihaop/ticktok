@@ -20,12 +20,15 @@ func main() {
 	// create a gin engine
 	engine := gin.Default()
 
+	// TODO initialize other domains
 	// initialize user's domain
 	userRepository := _userRepository.NewUserRepository(db)
 	userService := _userService.NewUserService(userRepository, nil)
-	_userController.RegisterUserController(engine.Group("/douyin/user"), userService)
+	userController := _userController.NewUserController(userService)
 
-	// TODO initialize other domains
+	// TODO initialize other routers
+	// initialize routers
+	userController.InitRouter(engine.Group("/douyin/user"))
 
 	// listen on 0.0.0.0:8080
 	if err := engine.Run(); err != nil {
