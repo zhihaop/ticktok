@@ -2,16 +2,49 @@
 
 2022 ByteDance Backend Summer Camp Project (inspired by TikTok)
 
-# Contributor
+## Contributor
 
 Thanks to the following developers for their support of the project. (In no particular order)
 
-[@zhihaop](https://github.com/zhihaop)
+[@zhihaop](https://github.com/zhihaop), [@northmachine](https://github.com/northmachine), 
+[@JukieChen](https://github.com/JukieChen), [@WYAOBO](https://github.com/WYAOBO), [@xjmxyt](https://github.com/xjmxyt)
 
-[@northmachine](https://github.com/northmachine)
+## Quick Start
 
-[@JukieChen](https://github.com/JukieChen)
+Go to the project directory and run the following shell commands.
 
-[@WYAOBO](https://github.com/WYAOBO)
+```shell
+go run app/main.go
+```
 
-[@xjmxyt](https://github.com/xjmxyt)
+## Project Structure
+
+The project structure is inspired by [go-clean-arch](https://github.com/bxcodec/go-clean-arch). We divide the project
+into domains according to business requirements.
+
+```
+├───app                 // bootstrap of the application
+├───comment             // comment domain
+│   ├───controller
+│   ├───repository
+│   └───service
+├───core
+├───entity              // entities (domains) of the application and their mocks
+│   └───mocks
+├───favourite           // favourite (user to video) domain
+├───follow              // follow (user to user) domain
+│   └───repository
+├───publish             // short-video publish domain
+│   ├───controller
+│   ├───repository
+│   └───service
+└───user                // user manage domain
+    ├───controller
+    ├───repository
+    └───service
+```
+
+## RESTFul Api Documentation
+
+We use the RESTFul api interface provided by ByteDance, see
+also [Apifox](https://www.apifox.cn/apidoc/shared-8cc50618-0da6-4d5e-a398-76f3b8f766c5/api-18345145).
