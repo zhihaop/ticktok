@@ -4,6 +4,7 @@
 *.dll
 *.so
 *.dylib
+local.db
 
 # Test binary, built with `go test -c`
 *.test
@@ -16,4 +17,3 @@
 
 # Exclude GoLand IDE temporary files
 .idea
-
