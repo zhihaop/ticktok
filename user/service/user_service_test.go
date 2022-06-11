@@ -1,46 +1,44 @@
-package service
+package service_test
 
 import (
 	"github.com/go-playground/assert/v2"
 	"github.com/zhihaop/ticktok/entity"
 	"github.com/zhihaop/ticktok/entity/mocks"
+	"github.com/zhihaop/ticktok/user/service"
 	"testing"
 )
 
-var (
-	repository entity.UserRepository
-	service    entity.UserService
-)
+var userService entity.UserService
 
 func init() {
-	repository = mocks.NewMockUserRepository()
-	service = NewUserService(repository, nil)
+	userService = service.NewUserService(
+		mocks.NewMockUserRepository(),
+		mocks.NewMockFollowRepository(),
+	)
 }
 
 func TestUserServiceImpl_Register(t *testing.T) {
-	token, err := service.Register("testRegister", "passwd")
+	token, err := userService.Register("testRegister", "passwd")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	user, err := repository.FindByUsername("testRegister")
+	username, err := userService.GetUsername(token.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, user.ID, token.ID)
-	assert.Equal(t, user.Name, "testRegister")
-	assert.Equal(t, user.Token, token.Token)
+	assert.Equal(t, username, "testRegister")
 	t.Logf("register success, id: %d, token: %s", token.ID, token.Token)
 }
 
 func TestUserServiceImpl_Login(t *testing.T) {
-	tokenRegister, err := service.Register("testLogin", "passwd")
+	tokenRegister, err := userService.Register("testLogin", "passwd")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	tokenLogin, err := service.Login("testLogin", "passwd")
+	tokenLogin, err := userService.Login("testLogin", "passwd")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,12 +48,12 @@ func TestUserServiceImpl_Login(t *testing.T) {
 }
 
 func TestUserServiceImpl_GetUserID(t *testing.T) {
-	token, err := service.Register("testUserID", "passwd")
+	token, err := userService.Register("testUserID", "passwd")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	id, err := service.GetUserID(token.Token)
+	id, err := userService.GetUserID(token.Token)
 	if err != nil {
 		t.Fatal(err)
 	}

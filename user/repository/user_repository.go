@@ -1,6 +1,7 @@
 package repository
 
 import (
+	utils "github.com/zhihaop/ticktok/core/repository"
 	"github.com/zhihaop/ticktok/entity"
 	"gorm.io/gorm"
 	"log"
@@ -12,24 +13,11 @@ type UserRepositoryImpl struct {
 }
 
 // NewUserRepository creates a user's repository
-func NewUserRepository(db *gorm.DB) *UserRepositoryImpl {
-	if err := initTable(db); err != nil {
+func NewUserRepository(db *gorm.DB) entity.UserRepository {
+	if err := utils.CheckOrCreateTable(db, &entity.User{}); err != nil {
 		log.Fatalln(err)
 	}
 	return &UserRepositoryImpl{db: db}
-}
-
-func initTable(db *gorm.DB) error {
-	// database already has table `Users`
-	if db.Migrator().HasTable(&entity.User{}) {
-		return nil
-	}
-
-	err := db.Migrator().CreateTable(&entity.User{})
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (u *UserRepositoryImpl) CreateUser(username string, password string, salt string) error {

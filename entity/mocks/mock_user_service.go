@@ -10,7 +10,7 @@ type MockUserService struct {
 	service entity.UserService
 }
 
-func NewMockUserService() *MockUserService {
+func NewMockUserService() entity.UserService {
 	userRepository := NewMockUserRepository()
 	followRepository := NewMockFollowRepository()
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	_followRepository "github.com/zhihaop/ticktok/follow/repository"
 	_userController "github.com/zhihaop/ticktok/user/controller"
 	_userRepository "github.com/zhihaop/ticktok/user/repository"
 	_userService "github.com/zhihaop/ticktok/user/service"
@@ -23,7 +24,8 @@ func main() {
 	// TODO initialize other domains
 	// initialize user's domain
 	userRepository := _userRepository.NewUserRepository(db)
-	userService := _userService.NewUserService(userRepository, nil)
+	followRepository := _followRepository.NewFollowRepository(db)
+	userService := _userService.NewUserService(userRepository, followRepository)
 	userController := _userController.NewUserController(userService)
 
 	// TODO initialize other routers

@@ -20,7 +20,7 @@ type Token struct {
 }
 
 // NewUserService creates and initializes an instance of UserServiceImpl
-func NewUserService(userRepository entity.UserRepository, followRepository entity.FollowRepository) *UserServiceImpl {
+func NewUserService(userRepository entity.UserRepository, followRepository entity.FollowRepository) entity.UserService {
 	return &UserServiceImpl{
 		userRepository:   userRepository,
 		followRepository: followRepository,

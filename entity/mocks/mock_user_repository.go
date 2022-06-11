@@ -10,10 +10,10 @@ import (
 
 // MockUserRepository provides a mock repository for UserRepository
 type MockUserRepository struct {
-	repo *repository.UserRepositoryImpl
+	repo entity.UserRepository
 }
 
-func NewMockUserRepository() *MockUserRepository {
+func NewMockUserRepository() entity.UserRepository {
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	if err != nil {
 		log.Fatalln(err)
