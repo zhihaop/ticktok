@@ -1,8 +1,8 @@
 package follow_repository
 
 import (
-	"github.com/zhihaop/ticktok/core"
 	utils "github.com/zhihaop/ticktok/core/repository"
+	"github.com/zhihaop/ticktok/core/service"
 	"github.com/zhihaop/ticktok/entity"
 	"gorm.io/gorm"
 	"log"
@@ -10,6 +10,7 @@ import (
 
 // FollowRepositoryImpl is an implementation of FollowRepository
 type FollowRepositoryImpl struct {
+	entity.FollowRepository
 	db *gorm.DB
 }
 
@@ -83,7 +84,7 @@ func (f *FollowRepositoryImpl) HasFollow(followerID int64, followID int64) (bool
 	if db.Error != nil {
 		return false, db.Error
 	} else if count < 0 || count > 1 {
-		return false, core.ErrInternalServerError
+		return false, service.ErrInternalServerError
 	}
 	return count == 1, nil
 }

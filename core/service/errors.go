@@ -1,4 +1,4 @@
-package core
+package service
 
 import "errors"
 
@@ -12,7 +12,7 @@ var (
 	ErrPasswordLengthInvalid     = errors.New("the length of password is invalid")
 )
 
-// ActionInValid FollowService error type
+// FollowService error type
 var (
 	ErrActionInValid    = errors.New("action is invalid")
 	ErrRelationExist    = errors.New("action follow failed: relation exists")

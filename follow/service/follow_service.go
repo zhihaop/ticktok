@@ -1,13 +1,14 @@
 package follow_service
 
 import (
-	"github.com/zhihaop/ticktok/core"
+	"github.com/zhihaop/ticktok/core/service"
 	"github.com/zhihaop/ticktok/entity"
 	"math"
 )
 
 // FollowServiceImpl is an implementation of FollowService
 type FollowServiceImpl struct {
+	entity.UserService
 	FollowRepository entity.FollowRepository
 	UserRepository   entity.UserRepository
 }
@@ -26,7 +27,7 @@ func (u *FollowServiceImpl) HasFollow(followerID int64, followID int64) (bool, e
 
 	hasFollow, err := u.FollowRepository.HasFollow(followerID, followID)
 	if err != nil {
-		return false, core.ErrInternalServerError
+		return false, service.ErrInternalServerError
 	}
 	return hasFollow, nil
 }
@@ -114,62 +115,62 @@ func (u *FollowServiceImpl) ListFollower(userID int64) ([]entity.UserInfo, error
 
 func (u *FollowServiceImpl) Follow(followerID int64, followID int64) error {
 	if followID == followerID {
-		return core.ErrSelfFollowing
+		return service.ErrSelfFollowing
 	}
 
 	if valid, err := u.checkUser(followerID); err != nil {
-		return core.ErrInternalServerError
+		return service.ErrInternalServerError
 	} else if !valid {
-		return core.ErrUserNotExist
+		return service.ErrUserNotExist
 	}
 
 	if valid, err := u.checkUser(followID); err != nil {
-		return core.ErrInternalServerError
+		return service.ErrInternalServerError
 	} else if !valid {
-		return core.ErrUserNotExist
+		return service.ErrUserNotExist
 	}
 
 	hasFollow, err := u.FollowRepository.HasFollow(followerID, followID)
 	if err != nil {
-		return core.ErrInternalServerError
+		return service.ErrInternalServerError
 	} else if hasFollow {
-		return core.ErrRelationExist
+		return service.ErrRelationExist
 	}
 
 	err = u.FollowRepository.InsertFollow(followerID, followID)
 	if err != nil {
-		return core.ErrInternalServerError
+		return service.ErrInternalServerError
 	}
 	return nil
 }
 
 func (u *FollowServiceImpl) UnFollow(followerID int64, followID int64) error {
 	if followID == followerID {
-		return core.ErrSelfUnFollowing
+		return service.ErrSelfUnFollowing
 	}
 
 	if valid, err := u.checkUser(followerID); err != nil {
-		return core.ErrInternalServerError
+		return service.ErrInternalServerError
 	} else if !valid {
-		return core.ErrUserNotExist
+		return service.ErrUserNotExist
 	}
 
 	if valid, err := u.checkUser(followID); err != nil {
-		return core.ErrInternalServerError
+		return service.ErrInternalServerError
 	} else if !valid {
-		return core.ErrUserNotExist
+		return service.ErrUserNotExist
 	}
 
 	hasFollow, err := u.FollowRepository.HasFollow(followerID, followID)
 	if err != nil {
-		return core.ErrInternalServerError
+		return service.ErrInternalServerError
 	} else if !hasFollow {
-		return core.ErrRelationNotExist
+		return service.ErrRelationNotExist
 	}
 
 	err = u.FollowRepository.DeleteFollow(followerID, followID)
 	if err != nil {
-		return core.ErrInternalServerError
+		return service.ErrInternalServerError
 	}
 	return nil
 }
@@ -177,7 +178,7 @@ func (u *FollowServiceImpl) UnFollow(followerID int64, followID int64) error {
 func (u *FollowServiceImpl) GetFollowerCount(id int64) (int64, error) {
 	followerCount, err := u.FollowRepository.CountFollowerByID(id)
 	if err != nil {
-		return 0, core.ErrInternalServerError
+		return 0, service.ErrInternalServerError
 	}
 	return followerCount, nil
 }
@@ -185,7 +186,7 @@ func (u *FollowServiceImpl) GetFollowerCount(id int64) (int64, error) {
 func (u *FollowServiceImpl) GetFollowCount(id int64) (int64, error) {
 	followingCount, err := u.FollowRepository.CountFollowByID(id)
 	if err != nil {
-		return 0, core.ErrInternalServerError
+		return 0, service.ErrInternalServerError
 	}
 	return followingCount, nil
 }

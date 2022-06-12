@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"github.com/zhihaop/ticktok/core"
+	"github.com/zhihaop/ticktok/core/service"
 	"github.com/zhihaop/ticktok/entity"
 	"gopkg.in/errgo.v2/errors"
 	"log"
@@ -11,6 +12,7 @@ import (
 
 // UserServiceImpl is an implementation of UserService
 type UserServiceImpl struct {
+	entity.UserService
 	userRepository entity.UserRepository
 }
 
@@ -55,28 +57,26 @@ func DecodeToken(s string) (Token, error) {
 func (u *UserServiceImpl) Register(username string, password string) (*entity.UserLoginToken, error) {
 	// the length of username should in range [5, 32]
 	if len(username) < 5 || len(username) > 32 {
-		return nil, core.ErrUsernameLengthInvalid
+		return nil, service.ErrUsernameLengthInvalid
 	}
 	// the length of password should in range [6, 32]
 	if len(password) < 6 || len(password) > 32 {
-		return nil, core.ErrPasswordLengthInvalid
+		return nil, service.ErrPasswordLengthInvalid
 	}
 
 	user, err := u.userRepository.FindByUsername(username)
 	if err != nil {
 		log.Printf("Register(...): %s\n", errors.Details(err))
-		return nil, core.ErrInternalServerError
-	}
-
-	if user != nil {
-		return nil, core.ErrUsernameExists
+		return nil, service.ErrInternalServerError
+	} else if user != nil {
+		return nil, service.ErrUsernameExists
 	}
 
 	salt := core.GetUUID()
 	encoded := core.Encoded(password, salt)
 	if err := u.userRepository.CreateUser(username, encoded, salt); err != nil {
 		log.Printf("Register(...): %s\n", errors.Details(err))
-		return nil, core.ErrInternalServerError
+		return nil, service.ErrInternalServerError
 	}
 	return u.Login(username, password)
 }
@@ -85,18 +85,12 @@ func (u *UserServiceImpl) Login(username string, password string) (*entity.UserL
 	user, err := u.userRepository.FindByUsername(username)
 	if err != nil {
 		log.Printf("Login(...): %s\n", errors.Details(err))
-		return nil, core.ErrInternalServerError
-	}
-
-	if user == nil {
-		return nil, core.ErrUserNotExist
-	}
-
-	if core.Encoded(password, user.Salt) != user.Password {
-		return nil, core.ErrUsernameOrPasswordInvalid
-	}
-
-	if user.Token != nil {
+		return nil, service.ErrInternalServerError
+	} else if user == nil {
+		return nil, service.ErrUserNotExist
+	} else if core.Encoded(password, user.Salt) != user.Password {
+		return nil, service.ErrUsernameOrPasswordInvalid
+	} else if user.Token != nil {
 		return &entity.UserLoginToken{ID: user.ID, Token: *user.Token}, nil
 	}
 
@@ -104,7 +98,7 @@ func (u *UserServiceImpl) Login(username string, password string) (*entity.UserL
 	tokenString := EncodeToken(token)
 	if err := u.userRepository.UpdateTokenByID(user.ID, tokenString); err != nil {
 		log.Printf("Login(...): %s\n", errors.Details(err))
-		return nil, core.ErrInternalServerError
+		return nil, service.ErrInternalServerError
 	}
 	return &entity.UserLoginToken{ID: user.ID, Token: tokenString}, nil
 }
@@ -113,11 +107,9 @@ func (u *UserServiceImpl) GetUsername(id int64) (string, error) {
 	user, err := u.userRepository.FindByID(id)
 	if err != nil {
 		log.Printf("GetUsername(...): %s\n", errors.Details(err))
-		return "", core.ErrInternalServerError
-	}
-
-	if user == nil {
-		return "", core.ErrUserNotExist
+		return "", service.ErrInternalServerError
+	} else if user == nil {
+		return "", service.ErrUserNotExist
 	}
 	return user.Name, nil
 }
@@ -126,11 +118,9 @@ func (u *UserServiceImpl) GetUserID(token string) (int64, error) {
 	user, err := u.userRepository.FindByToken(token)
 	if err != nil {
 		log.Printf("GetUserID(...): %s\n", errors.Details(err))
-		return 0, core.ErrInternalServerError
-	}
-
-	if user == nil {
-		return 0, core.ErrUserNotExist
+		return 0, service.ErrInternalServerError
+	} else if user == nil {
+		return 0, service.ErrUserNotExist
 	}
 	return user.ID, nil
 }

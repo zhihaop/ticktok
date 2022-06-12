@@ -9,6 +9,7 @@ import (
 
 // UserRepositoryImpl is an implementation of UserRepository
 type UserRepositoryImpl struct {
+	entity.UserRepository
 	db *gorm.DB
 }
 

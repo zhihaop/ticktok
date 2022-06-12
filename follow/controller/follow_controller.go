@@ -2,8 +2,8 @@ package follow_controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/zhihaop/ticktok/core"
 	"github.com/zhihaop/ticktok/core/controller"
+	"github.com/zhihaop/ticktok/core/service"
 	"github.com/zhihaop/ticktok/entity"
 	"net/http"
 	"strconv"
@@ -22,7 +22,7 @@ type FollowController struct {
 }
 
 type followListResponse struct {
-	core.Response
+	controller.Response
 	UserList []entity.UserInfo `json:"user_list"`
 }
 
@@ -48,13 +48,13 @@ func (u *FollowController) Action(g *gin.Context) {
 
 	followID, err := strconv.ParseInt(sFollowID, 10, 64)
 	if err != nil {
-		g.JSON(http.StatusOK, core.ResponseError(err))
+		g.JSON(http.StatusOK, controller.ResponseError(err))
 		return
 	}
 
 	followerID, err := u.UserService.GetUserID(token)
 	if err != nil {
-		g.JSON(http.StatusOK, core.ResponseError(err))
+		g.JSON(http.StatusOK, controller.ResponseError(err))
 		return
 	}
 
@@ -62,19 +62,19 @@ func (u *FollowController) Action(g *gin.Context) {
 	case ActionFollow:
 		err := u.FollowService.Follow(followerID, followID)
 		if err != nil {
-			g.JSON(http.StatusOK, core.ResponseError(err))
+			g.JSON(http.StatusOK, controller.ResponseError(err))
 		}
 	case ActionUnfollow:
 		err := u.FollowService.UnFollow(followerID, followID)
 		if err != nil {
-			g.JSON(http.StatusOK, core.ResponseError(err))
+			g.JSON(http.StatusOK, controller.ResponseError(err))
 		}
 	default:
-		g.JSON(http.StatusOK, core.ResponseError(core.ErrActionInValid))
+		g.JSON(http.StatusOK, controller.ResponseError(service.ErrActionInValid))
 		return
 	}
 
-	g.JSON(http.StatusOK, core.ResponseOK())
+	g.JSON(http.StatusOK, controller.ResponseOK())
 }
 
 func (u *FollowController) ListFollow(g *gin.Context) {
@@ -83,13 +83,13 @@ func (u *FollowController) ListFollow(g *gin.Context) {
 
 	userID, err := strconv.ParseInt(sUserID, 10, 64)
 	if err != nil {
-		g.JSON(http.StatusOK, core.ResponseError(err))
+		g.JSON(http.StatusOK, controller.ResponseError(err))
 		return
 	}
 
 	id, err := u.UserService.GetUserID(token)
 	if err != nil {
-		g.JSON(http.StatusOK, core.ResponseError(err))
+		g.JSON(http.StatusOK, controller.ResponseError(err))
 		return
 	}
 
@@ -99,12 +99,12 @@ func (u *FollowController) ListFollow(g *gin.Context) {
 
 	follows, err := u.FollowService.ListFollow(userID)
 	if err != nil {
-		g.JSON(http.StatusOK, core.ResponseError(err))
+		g.JSON(http.StatusOK, controller.ResponseError(err))
 		return
 	}
 
 	g.JSON(http.StatusOK, &followListResponse{
-		Response: core.ResponseOK(),
+		Response: controller.ResponseOK(),
 		UserList: follows,
 	})
 }
@@ -115,13 +115,13 @@ func (u *FollowController) ListFollower(g *gin.Context) {
 
 	userID, err := strconv.ParseInt(sUserID, 10, 64)
 	if err != nil {
-		g.JSON(http.StatusOK, core.ResponseError(err))
+		g.JSON(http.StatusOK, controller.ResponseError(err))
 		return
 	}
 
 	id, err := u.UserService.GetUserID(token)
 	if err != nil {
-		g.JSON(http.StatusOK, core.ResponseError(err))
+		g.JSON(http.StatusOK, controller.ResponseError(err))
 		return
 	}
 
@@ -131,12 +131,12 @@ func (u *FollowController) ListFollower(g *gin.Context) {
 
 	followers, err := u.FollowService.ListFollower(userID)
 	if err != nil {
-		g.JSON(http.StatusOK, core.ResponseError(err))
+		g.JSON(http.StatusOK, controller.ResponseError(err))
 		return
 	}
 
 	g.JSON(http.StatusOK, &followListResponse{
-		Response: core.ResponseOK(),
+		Response: controller.ResponseOK(),
 		UserList: followers,
 	})
 }
