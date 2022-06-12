@@ -21,15 +21,21 @@ type UserLoginToken struct {
 	Token string
 }
 
+// UserInfo includes all the info about user's follow relationship
+type UserInfo struct {
+	FollowCount   int64  `json:"follow_count"`
+	FollowerCount int64  `json:"follower_count"`
+	ID            int64  `json:"id"`
+	IsFollow      bool   `json:"is_follow"`
+	Name          string `json:"name"`
+}
+
 // UserService represents the user's service
 type UserService interface {
 	Register(username string, password string) (*UserLoginToken, error)
 	Login(username string, password string) (*UserLoginToken, error)
 	GetUsername(id int64) (string, error)
-	GetFollowerCount(id int64) (int64, error)
-	GetFollowCount(id int64) (int64, error)
 	GetUserID(token string) (int64, error)
-	IsFollow(followerID int64, followID int64) (bool, error)
 }
 
 // UserRepository represents the user's repository

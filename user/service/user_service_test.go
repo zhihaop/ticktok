@@ -1,4 +1,4 @@
-package service_test
+package user_service_test
 
 import (
 	"github.com/go-playground/assert/v2"
@@ -11,9 +11,8 @@ import (
 var userService entity.UserService
 
 func init() {
-	userService = service.NewUserService(
+	userService = user_service.NewUserService(
 		mocks.NewMockUserRepository(),
-		mocks.NewMockFollowRepository(),
 	)
 }
 
@@ -65,19 +64,4 @@ func TestUserServiceImpl_GetUserID(t *testing.T) {
 	}
 
 	assert.Equal(t, id, token.ID)
-}
-
-func TestUserServiceImpl_GetFollowCount(t *testing.T) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func TestUserServiceImpl_GetFollowerCount(t *testing.T) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func TestUserServiceImpl_IsFollow(t *testing.T) {
-	//TODO implement me
-	panic("implement me")
 }

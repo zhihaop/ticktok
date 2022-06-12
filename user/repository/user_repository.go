@@ -1,4 +1,4 @@
-package repository
+package user_repository
 
 import (
 	utils "github.com/zhihaop/ticktok/core/repository"
