@@ -1,4 +1,4 @@
-package repository
+package follow_repository
 
 import (
 	"github.com/zhihaop/ticktok/core"
@@ -11,6 +11,24 @@ import (
 // FollowRepositoryImpl is an implementation of FollowRepository
 type FollowRepositoryImpl struct {
 	db *gorm.DB
+}
+
+func (f *FollowRepositoryImpl) FetchFollow(followerID int64, offset int64, limit int64) ([]entity.Follow, error) {
+	follows := make([]entity.Follow, 0)
+	db := f.db.Model(&entity.Follow{}).Where("follower_id = ?", followerID).Find(&follows)
+	if db.Error != nil {
+		return nil, db.Error
+	}
+	return follows, nil
+}
+
+func (f *FollowRepositoryImpl) FetchFollower(followID int64, offset int64, limit int64) ([]entity.Follow, error) {
+	follows := make([]entity.Follow, 0)
+	db := f.db.Model(&entity.Follow{}).Where("follow_id = ?", followID).Find(&follows)
+	if db.Error != nil {
+		return nil, db.Error
+	}
+	return follows, nil
 }
 
 func NewFollowRepository(db *gorm.DB) entity.FollowRepository {
@@ -48,6 +66,7 @@ func (f *FollowRepositoryImpl) InsertFollow(followerID int64, followID int64) er
 	if db.Error != nil {
 		return db.Error
 	}
+
 	return nil
 }
 
@@ -59,6 +78,7 @@ func (f *FollowRepositoryImpl) DeleteFollow(followerID int64, followID int64) er
 	if db.Error != nil {
 		return db.Error
 	}
+
 	return nil
 }
 
@@ -67,9 +87,7 @@ func (f *FollowRepositoryImpl) HasFollow(followerID int64, followID int64) (bool
 	db := f.db.Model(&entity.Follow{}).Where("follower_id = ? AND follow_id = ?", followerID, followID).Count(&count)
 	if db.Error != nil {
 		return false, db.Error
-	}
-
-	if count < 0 || count > 1 {
+	} else if count < 0 || count > 1 {
 		return false, core.ErrInternalServerError
 	}
 

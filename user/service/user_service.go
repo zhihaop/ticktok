@@ -1,4 +1,4 @@
-package service
+package user_service
 
 import (
 	"encoding/base64"
@@ -11,8 +11,7 @@ import (
 
 // UserServiceImpl is an implementation of UserService
 type UserServiceImpl struct {
-	userRepository   entity.UserRepository
-	followRepository entity.FollowRepository
+	userRepository entity.UserRepository
 }
 
 // Token is a representation of user's token.
@@ -22,10 +21,9 @@ type Token struct {
 }
 
 // NewUserService creates and initializes an instance of UserServiceImpl
-func NewUserService(userRepository entity.UserRepository, followRepository entity.FollowRepository) entity.UserService {
+func NewUserService(userRepository entity.UserRepository) entity.UserService {
 	return &UserServiceImpl{
-		userRepository:   userRepository,
-		followRepository: followRepository,
+		userRepository: userRepository,
 	}
 }
 
@@ -55,8 +53,8 @@ func DecodeToken(s string) (Token, error) {
 }
 
 func (u *UserServiceImpl) Register(username string, password string) (*entity.UserLoginToken, error) {
-	// the length of username should in range [6, 32]
-	if len(username) < 6 || len(username) > 32 {
+	// the length of username should in range [5, 32]
+	if len(username) < 5 || len(username) > 32 {
 		return nil, core.ErrUsernameLengthInvalid
 	}
 	// the length of password should in range [6, 32]
@@ -124,24 +122,6 @@ func (u *UserServiceImpl) GetUsername(id int64) (string, error) {
 	return user.Name, nil
 }
 
-func (u *UserServiceImpl) GetFollowerCount(id int64) (int64, error) {
-	followerCount, err := u.followRepository.CountFollowerByID(id)
-	if err != nil {
-		log.Printf("GetFollowerCount(...): %s\n", errors.Details(err))
-		return 0, core.ErrInternalServerError
-	}
-	return followerCount, nil
-}
-
-func (u *UserServiceImpl) GetFollowCount(id int64) (int64, error) {
-	followingCount, err := u.followRepository.CountFollowByID(id)
-	if err != nil {
-		log.Printf("GetFollowCount(...): %s\n", errors.Details(err))
-		return 0, core.ErrInternalServerError
-	}
-	return followingCount, nil
-}
-
 func (u *UserServiceImpl) GetUserID(token string) (int64, error) {
 	user, err := u.userRepository.FindByToken(token)
 	if err != nil {
@@ -153,17 +133,4 @@ func (u *UserServiceImpl) GetUserID(token string) (int64, error) {
 		return 0, core.ErrUserNotExist
 	}
 	return user.ID, nil
-}
-
-func (u *UserServiceImpl) IsFollow(followerID int64, followID int64) (bool, error) {
-	if followerID == followID {
-		return false, nil
-	}
-
-	isFollow, err := u.followRepository.HasFollow(followerID, followID)
-	if err != nil {
-		log.Printf("IsFollow(...): %s\n", errors.Details(err))
-		return false, core.ErrInternalServerError
-	}
-	return isFollow, nil
 }

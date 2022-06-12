@@ -1,4 +1,4 @@
-package controller
+package user_controller
 
 import (
 	"github.com/gin-gonic/gin"
@@ -10,7 +10,8 @@ import (
 
 // UserController handles all the request mapping to '/douyin/user'
 type UserController struct {
-	UserService entity.UserService
+	UserService     entity.UserService
+	FollowerService entity.FollowService
 }
 
 // UserLoginResponse is the response type for '/douyin/user/login' api
@@ -23,16 +24,15 @@ type UserLoginResponse struct {
 // UserInfoResponse is the response type for '/douyin/user' api
 type UserInfoResponse struct {
 	core.Response
-	ID            int64  `json:"id"`
-	Name          string `json:"name"`
-	FollowCount   int64  `json:"follow_count"`
-	FollowerCount int64  `json:"follower_count"`
-	IsFollow      bool   `json:"is_follow"`
+	entity.UserInfo
 }
 
 // NewUserController creates an instance of UserController
-func NewUserController(userService entity.UserService) *UserController {
-	return &UserController{UserService: userService}
+func NewUserController(userService entity.UserService, followService entity.FollowService) *UserController {
+	return &UserController{
+		UserService:     userService,
+		FollowerService: followService,
+	}
 }
 
 // InitRouter register handlers to gin.RouterGroup
@@ -100,30 +100,32 @@ func (u *UserController) Info(c *gin.Context) {
 		return
 	}
 
-	followerCount, err := u.UserService.GetFollowerCount(id)
+	followerCount, err := u.FollowerService.GetFollowerCount(id)
 	if err != nil {
 		c.JSON(http.StatusOK, core.ResponseError(err))
 		return
 	}
 
-	followCount, err := u.UserService.GetFollowCount(id)
+	followCount, err := u.FollowerService.GetFollowCount(id)
 	if err != nil {
 		c.JSON(http.StatusOK, core.ResponseError(err))
 		return
 	}
 
-	isFollow, err := u.UserService.IsFollow(userID, id)
+	hasFollow, err := u.FollowerService.HasFollow(userID, id)
 	if err != nil {
 		c.JSON(http.StatusOK, core.ResponseError(err))
 		return
 	}
 
 	c.JSON(http.StatusOK, UserInfoResponse{
-		Response:      core.ResponseOK(),
-		ID:            userID,
-		Name:          username,
-		FollowCount:   followCount,
-		FollowerCount: followerCount,
-		IsFollow:      isFollow,
+		Response: core.ResponseOK(),
+		UserInfo: entity.UserInfo{
+			ID:            userID,
+			Name:          username,
+			FollowCount:   followCount,
+			FollowerCount: followerCount,
+			IsFollow:      hasFollow,
+		},
 	})
 }
