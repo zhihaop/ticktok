@@ -16,15 +16,15 @@ type UserController struct {
 // UserLoginResponse is the response type for '/douyin/user/login' api
 type UserLoginResponse struct {
 	core.Response
-	UserID int64  `json:"user_id,omitempty"`
+	UserID int64  `json:"user_id"`
 	Token  string `json:"token"`
 }
 
 // UserInfoResponse is the response type for '/douyin/user' api
 type UserInfoResponse struct {
 	core.Response
-	ID            int64  `json:"id,omitempty"`
-	Name          string `json:"name,omitempty"`
+	ID            int64  `json:"id"`
+	Name          string `json:"name"`
 	FollowCount   int64  `json:"follow_count"`
 	FollowerCount int64  `json:"follower_count"`
 	IsFollow      bool   `json:"is_follow"`
@@ -37,9 +37,9 @@ func NewUserController(userService entity.UserService) *UserController {
 
 // InitRouter register handlers to gin.RouterGroup
 func (u *UserController) InitRouter(g *gin.RouterGroup) {
-	g.POST("/register", u.Register)
-	g.POST("/login", u.Login)
-	g.POST("/", u.Info)
+	g.POST("/register/", u.Register)
+	g.POST("/login/", u.Login)
+	g.GET("/", u.Info)
 }
 
 func (u *UserController) Register(c *gin.Context) {
@@ -80,7 +80,9 @@ func (u *UserController) Login(c *gin.Context) {
 
 func (u *UserController) Info(c *gin.Context) {
 	token := c.Query("token")
-	id, err := strconv.ParseInt(c.Query("id"), 10, 64)
+	stringID := c.Query("user_id")
+
+	id, err := strconv.ParseInt(stringID, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusOK, core.ResponseError(err))
 		return
