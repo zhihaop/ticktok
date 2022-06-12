@@ -55,12 +55,12 @@ func DecodeToken(s string) (Token, error) {
 }
 
 func (u *UserServiceImpl) Register(username string, password string) (*entity.UserLoginToken, error) {
-	// the length of username should in range [5, 32]
-	if len(username) < 5 || len(username) > 32 {
+	// the length of username should in range [6, 32]
+	if len(username) < 6 || len(username) > 32 {
 		return nil, core.ErrUsernameLengthInvalid
 	}
-	// the length of password should in range [5, 32]
-	if len(password) < 5 || len(password) > 32 {
+	// the length of password should in range [6, 32]
+	if len(password) < 6 || len(password) > 32 {
 		return nil, core.ErrPasswordLengthInvalid
 	}
 

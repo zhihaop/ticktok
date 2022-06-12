@@ -33,7 +33,7 @@ func main() {
 	userController.InitRouter(engine.Group("/douyin/user"))
 
 	// listen on 0.0.0.0:8080
-	if err := engine.Run(); err != nil {
+	if err := engine.Run("0.0.0.0:8080"); err != nil {
 		log.Fatalln(err)
 	}
 }
