@@ -70,10 +70,7 @@ func (f *FollowRepositoryImpl) InsertFollow(followerID int64, followID int64) er
 }
 
 func (f *FollowRepositoryImpl) DeleteFollow(followerID int64, followID int64) error {
-	db := f.db.Delete(&entity.Follow{
-		FollowerID: followerID,
-		FollowID:   followID,
-	}, 1)
+	db := f.db.Where("follower_id = ? AND follow_id = ?", followerID, followID).Delete(&entity.Follow{})
 	if db.Error != nil {
 		return db.Error
 	}

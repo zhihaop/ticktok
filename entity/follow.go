@@ -1,15 +1,9 @@
 package entity
 
-import (
-	"time"
-)
-
 // Follow is a row in `follows` table
 type Follow struct {
-	ID         int64 `gorm:"autoIncrement"`
-	FollowerID int64
-	FollowID   int64
-	CreateAt   time.Time
+	FollowerID int64 `gorm:"primaryKey"`
+	FollowID   int64 `gorm:"primaryKey"`
 }
 
 // FollowService represents the user's follow service
