@@ -3,6 +3,7 @@ package follow_controller
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhihaop/ticktok/core"
+	"github.com/zhihaop/ticktok/core/controller"
 	"github.com/zhihaop/ticktok/entity"
 	"net/http"
 	"strconv"
@@ -15,6 +16,7 @@ const (
 
 // FollowController handles all the request mapping to '/douyin/relation'
 type FollowController struct {
+	controller.Controller
 	UserService   entity.UserService
 	FollowService entity.FollowService
 }
@@ -25,7 +27,7 @@ type followListResponse struct {
 }
 
 // NewFollowController creates an instance of FollowController
-func NewFollowController(userService entity.UserService, followService entity.FollowService) *FollowController {
+func NewFollowController(userService entity.UserService, followService entity.FollowService) controller.Controller {
 	return &FollowController{
 		UserService:   userService,
 		FollowService: followService,

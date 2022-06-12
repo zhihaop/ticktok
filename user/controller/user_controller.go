@@ -3,6 +3,7 @@ package user_controller
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhihaop/ticktok/core"
+	"github.com/zhihaop/ticktok/core/controller"
 	"github.com/zhihaop/ticktok/entity"
 	"net/http"
 	"strconv"
@@ -10,6 +11,7 @@ import (
 
 // UserController handles all the request mapping to '/douyin/user'
 type UserController struct {
+	controller.Controller
 	UserService     entity.UserService
 	FollowerService entity.FollowService
 }
@@ -28,7 +30,7 @@ type UserInfoResponse struct {
 }
 
 // NewUserController creates an instance of UserController
-func NewUserController(userService entity.UserService, followService entity.FollowService) *UserController {
+func NewUserController(userService entity.UserService, followService entity.FollowService) controller.Controller {
 	return &UserController{
 		UserService:     userService,
 		FollowerService: followService,

@@ -13,6 +13,7 @@ type FollowRepositoryImpl struct {
 	db *gorm.DB
 }
 
+// FetchFollow TODO add `offset` and `limit` support
 func (f *FollowRepositoryImpl) FetchFollow(followerID int64, offset int64, limit int64) ([]entity.Follow, error) {
 	follows := make([]entity.Follow, 0)
 	db := f.db.Model(&entity.Follow{}).Where("follower_id = ?", followerID).Find(&follows)
@@ -22,6 +23,7 @@ func (f *FollowRepositoryImpl) FetchFollow(followerID int64, offset int64, limit
 	return follows, nil
 }
 
+// FetchFollower TODO add `offset` and `limit` support
 func (f *FollowRepositoryImpl) FetchFollower(followID int64, offset int64, limit int64) ([]entity.Follow, error) {
 	follows := make([]entity.Follow, 0)
 	db := f.db.Model(&entity.Follow{}).Where("follow_id = ?", followID).Find(&follows)
@@ -44,7 +46,6 @@ func (f *FollowRepositoryImpl) CountFollowerByID(followID int64) (int64, error) 
 	if db.Error != nil {
 		return -1, db.Error
 	}
-
 	return followerCount, nil
 }
 
@@ -54,7 +55,6 @@ func (f *FollowRepositoryImpl) CountFollowByID(followerID int64) (int64, error) 
 	if db.Error != nil {
 		return -1, db.Error
 	}
-
 	return followCount, nil
 }
 
@@ -66,7 +66,6 @@ func (f *FollowRepositoryImpl) InsertFollow(followerID int64, followID int64) er
 	if db.Error != nil {
 		return db.Error
 	}
-
 	return nil
 }
 
@@ -78,7 +77,6 @@ func (f *FollowRepositoryImpl) DeleteFollow(followerID int64, followID int64) er
 	if db.Error != nil {
 		return db.Error
 	}
-
 	return nil
 }
 
@@ -90,6 +88,5 @@ func (f *FollowRepositoryImpl) HasFollow(followerID int64, followID int64) (bool
 	} else if count < 0 || count > 1 {
 		return false, core.ErrInternalServerError
 	}
-
 	return count == 1, nil
 }

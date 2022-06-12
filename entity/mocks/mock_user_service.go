@@ -2,7 +2,7 @@ package mocks
 
 import (
 	"github.com/zhihaop/ticktok/entity"
-	"github.com/zhihaop/ticktok/user/service"
+	user_service "github.com/zhihaop/ticktok/user/service"
 )
 
 // MockUserService provides a mock service for UserService
@@ -12,7 +12,6 @@ type MockUserService struct {
 
 func NewMockUserService() entity.UserService {
 	userRepository := NewMockUserRepository()
-	followRepository := NewMockFollowRepository()
 
-	return &MockUserService{service.NewUserService(userRepository, followRepository)}
+	return &MockUserService{user_service.NewUserService(userRepository)}
 }

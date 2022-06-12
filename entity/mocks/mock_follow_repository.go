@@ -18,6 +18,6 @@ func NewMockFollowRepository() entity.FollowRepository {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	mock := &MockFollowRepository{repository.NewFollowRepository(db)}
+	mock := &MockFollowRepository{follow_repository.NewFollowRepository(db)}
 	return mock
 }

@@ -18,6 +18,6 @@ func NewMockUserRepository() entity.UserRepository {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	mock := &MockUserRepository{repository.NewUserRepository(db)}
+	mock := &MockUserRepository{user_repository.NewUserRepository(db)}
 	return mock
 }
