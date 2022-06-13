@@ -36,6 +36,7 @@ type UserService interface {
 	Login(username string, password string) (*UserLoginToken, error)
 	GetUsername(id int64) (string, error)
 	GetUserID(token string) (int64, error)
+	GetUserInfo(userID int64, queryID int64) (*UserInfo, error)
 }
 
 // UserRepository represents the user's repository

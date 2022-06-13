@@ -12,8 +12,8 @@ import (
 
 // UserServiceImpl is an implementation of UserService
 type UserServiceImpl struct {
-	entity.UserService
-	userRepository entity.UserRepository
+	userRepository   entity.UserRepository
+	followRepository entity.FollowRepository
 }
 
 // Token is a representation of user's token.
@@ -23,10 +23,41 @@ type Token struct {
 }
 
 // NewUserService creates and initializes an instance of UserServiceImpl
-func NewUserService(userRepository entity.UserRepository) entity.UserService {
+func NewUserService(userRepository entity.UserRepository, followRepository entity.FollowRepository) entity.UserService {
 	return &UserServiceImpl{
-		userRepository: userRepository,
+		userRepository:   userRepository,
+		followRepository: followRepository,
 	}
+}
+
+func (u *UserServiceImpl) GetUserInfo(userID int64, queryID int64) (*entity.UserInfo, error) {
+	username, err := u.GetUsername(queryID)
+	if err != nil {
+		return nil, err
+	}
+
+	followerCount, err := u.followRepository.CountFollowerByID(queryID)
+	if err != nil {
+		return nil, err
+	}
+
+	followCount, err := u.followRepository.CountFollowByID(queryID)
+	if err != nil {
+		return nil, err
+	}
+
+	hasFollow, err := u.followRepository.HasFollow(userID, queryID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entity.UserInfo{
+		ID:            queryID,
+		Name:          username,
+		FollowCount:   followCount,
+		FollowerCount: followerCount,
+		IsFollow:      hasFollow,
+	}, nil
 }
 
 // GenerateToken generates the token for specific user.

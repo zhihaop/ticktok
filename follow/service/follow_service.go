@@ -41,7 +41,7 @@ func (u *FollowServiceImpl) checkUser(id int64) (bool, error) {
 }
 
 func (u *FollowServiceImpl) ListFollow(userID int64) ([]entity.UserInfo, error) {
-	follow, err := u.FollowRepository.FetchFollow(userID, 0, math.MaxInt64)
+	follow, err := u.FollowRepository.FetchFollow(userID, 0, math.MaxInt)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (u *FollowServiceImpl) ListFollow(userID int64) ([]entity.UserInfo, error) 
 }
 
 func (u *FollowServiceImpl) ListFollower(userID int64) ([]entity.UserInfo, error) {
-	follow, err := u.FollowRepository.FetchFollower(userID, 0, math.MaxInt64)
+	follow, err := u.FollowRepository.FetchFollower(userID, 0, math.MaxInt)
 	if err != nil {
 		return nil, err
 	}

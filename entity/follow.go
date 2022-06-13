@@ -24,6 +24,6 @@ type FollowRepository interface {
 	InsertFollow(followerID int64, followingID int64) error
 	DeleteFollow(followerID int64, followingID int64) error
 	HasFollow(followerID int64, followID int64) (bool, error)
-	FetchFollow(followerID int64, offset int64, limit int64) ([]Follow, error)
-	FetchFollower(followID int64, offset int64, limit int64) ([]Follow, error)
+	FetchFollow(followerID int64, offset int, limit int) ([]Follow, error)
+	FetchFollower(followID int64, offset int, limit int) ([]Follow, error)
 }

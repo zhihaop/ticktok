@@ -79,9 +79,9 @@ func (u *UserController) Login(c *gin.Context) {
 
 func (u *UserController) Info(c *gin.Context) {
 	token := c.Query("token")
-	stringID := c.Query("user_id")
+	sQueryID := c.Query("user_id")
 
-	id, err := strconv.ParseInt(stringID, 10, 64)
+	queryID, err := strconv.ParseInt(sQueryID, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusOK, controller.ResponseError(err))
 		return
@@ -93,25 +93,7 @@ func (u *UserController) Info(c *gin.Context) {
 		return
 	}
 
-	username, err := u.UserService.GetUsername(id)
-	if err != nil {
-		c.JSON(http.StatusOK, controller.ResponseError(err))
-		return
-	}
-
-	followerCount, err := u.FollowerService.GetFollowerCount(id)
-	if err != nil {
-		c.JSON(http.StatusOK, controller.ResponseError(err))
-		return
-	}
-
-	followCount, err := u.FollowerService.GetFollowCount(id)
-	if err != nil {
-		c.JSON(http.StatusOK, controller.ResponseError(err))
-		return
-	}
-
-	hasFollow, err := u.FollowerService.HasFollow(userID, id)
+	userInfo, err := u.UserService.GetUserInfo(userID, queryID)
 	if err != nil {
 		c.JSON(http.StatusOK, controller.ResponseError(err))
 		return
@@ -119,12 +101,6 @@ func (u *UserController) Info(c *gin.Context) {
 
 	c.JSON(http.StatusOK, UserInfoResponse{
 		Response: controller.ResponseOK(),
-		UserInfo: entity.UserInfo{
-			ID:            userID,
-			Name:          username,
-			FollowCount:   followCount,
-			FollowerCount: followerCount,
-			IsFollow:      hasFollow,
-		},
+		UserInfo: *userInfo,
 	})
 }

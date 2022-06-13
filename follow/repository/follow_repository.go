@@ -14,22 +14,24 @@ type FollowRepositoryImpl struct {
 	db *gorm.DB
 }
 
-// FetchFollow TODO add `offset` and `limit` support
-func (f *FollowRepositoryImpl) FetchFollow(followerID int64, offset int64, limit int64) ([]entity.Follow, error) {
+func (f *FollowRepositoryImpl) FetchFollow(followerID int64, offset int, limit int) ([]entity.Follow, error) {
 	follows := make([]entity.Follow, 0)
-	db := f.db.Model(&entity.Follow{}).Where("follower_id = ?", followerID).Find(&follows)
-	if db.Error != nil {
-		return nil, db.Error
+	query := f.db.Model(&entity.Follow{})
+
+	query = query.Where("follower_id = ?", followerID).Offset(offset).Limit(limit)
+	if err := query.Find(&follows).Error; err != nil {
+		return nil, err
 	}
 	return follows, nil
 }
 
-// FetchFollower TODO add `offset` and `limit` support
-func (f *FollowRepositoryImpl) FetchFollower(followID int64, offset int64, limit int64) ([]entity.Follow, error) {
+func (f *FollowRepositoryImpl) FetchFollower(followID int64, offset int, limit int) ([]entity.Follow, error) {
 	follows := make([]entity.Follow, 0)
-	db := f.db.Model(&entity.Follow{}).Where("follow_id = ?", followID).Find(&follows)
-	if db.Error != nil {
-		return nil, db.Error
+	query := f.db.Model(&entity.Follow{})
+
+	query = query.Where("follow_id = ?", followID).Offset(offset).Limit(limit)
+	if err := query.Find(&follows).Error; err != nil {
+		return nil, err
 	}
 	return follows, nil
 }

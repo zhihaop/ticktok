@@ -20,3 +20,8 @@ var (
 	ErrSelfFollowing    = errors.New("action follow failed: self following")
 	ErrSelfUnFollowing  = errors.New("action unfollow failed: self following")
 )
+
+// PushService error type
+var (
+	ErrVideoFileInValid = errors.New("the uploaded video file is invalid")
+)
