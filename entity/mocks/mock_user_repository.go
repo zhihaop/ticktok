@@ -8,16 +8,11 @@ import (
 	"log"
 )
 
-// MockUserRepository provides a mock repository for UserRepository
-type MockUserRepository struct {
-	entity.UserRepository
-}
-
+// NewMockUserRepository creates a mock repository for UserRepository
 func NewMockUserRepository() entity.UserRepository {
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	if err != nil {
 		log.Fatalln(err)
 	}
-	mock := &MockUserRepository{user_repository.NewUserRepository(db)}
-	return mock
+	return user_repository.NewUserRepository(db)
 }

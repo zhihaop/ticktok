@@ -5,14 +5,10 @@ import (
 	"github.com/zhihaop/ticktok/user/service"
 )
 
-// MockFollowService provides a mock service for FollowService
-type MockFollowService struct {
-	entity.FollowService
-}
-
+// NewMockFollowService creates a mock service for FollowService
 func NewMockFollowService() entity.FollowService {
-	return &user_service.FollowServiceImpl{
-		FollowRepository: NewMockFollowRepository(),
-		UserRepository:   NewMockUserRepository(),
-	}
+	return user_service.NewFollowService(
+		NewMockFollowRepository(),
+		NewMockUserRepository(),
+	)
 }

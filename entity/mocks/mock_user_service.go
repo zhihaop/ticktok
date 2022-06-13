@@ -5,13 +5,10 @@ import (
 	user_service "github.com/zhihaop/ticktok/user/service"
 )
 
-// MockUserService provides a mock service for us
-type MockUserService struct {
-	entity.UserService
-}
-
+// NewMockUserService creates a mock service for UserService
 func NewMockUserService() entity.UserService {
-	userRepository := NewMockUserRepository()
-
-	return &MockUserService{user_service.NewUserService(userRepository)}
+	return user_service.NewUserService(
+		NewMockUserRepository(),
+		NewMockFollowRepository(),
+	)
 }
