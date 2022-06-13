@@ -10,7 +10,7 @@ import (
 	"log"
 )
 
-// userServiceImpl is an implementation of us
+// userServiceImpl is an implementation of UserService
 type userServiceImpl struct {
 	userRepository   entity.UserRepository
 	followRepository entity.FollowRepository
