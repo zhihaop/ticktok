@@ -10,8 +10,8 @@ type Follow struct {
 type FollowService interface {
 	Follow(followerID int64, followID int64) error
 	UnFollow(followerID int64, followID int64) error
-	ListFollow(userID int64) ([]UserInfo, error)
-	ListFollower(userID int64) ([]UserInfo, error)
+	ListFollow(userID int64, queryID int64) ([]UserInfo, error)
+	ListFollower(userID int64, queryID int64) ([]UserInfo, error)
 	GetFollowerCount(userID int64) (int64, error)
 	GetFollowCount(userID int64) (int64, error)
 	HasFollow(followerID int64, followID int64) (bool, error)

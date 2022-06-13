@@ -8,42 +8,42 @@ import (
 	"strconv"
 )
 
-// UserController handles all the request mapping to '/douyin/user'
-type UserController struct {
+// userController handles all the request mapping to '/douyin/user'
+type userController struct {
 	controller.Controller
 	UserService     entity.UserService
 	FollowerService entity.FollowService
 }
 
-// UserLoginResponse is the response type for '/douyin/user/login' api
-type UserLoginResponse struct {
+// loginResponse is the response type for '/douyin/user/login' api
+type loginResponse struct {
 	controller.Response
 	UserID int64  `json:"user_id"`
 	Token  string `json:"token"`
 }
 
-// UserInfoResponse is the response type for '/douyin/user' api
-type UserInfoResponse struct {
+// infoResponse is the response type for '/douyin/user' api
+type infoResponse struct {
 	controller.Response
 	entity.UserInfo
 }
 
-// NewUserController creates an instance of UserController
+// NewUserController creates an instance of userController
 func NewUserController(userService entity.UserService, followService entity.FollowService) controller.Controller {
-	return &UserController{
+	return &userController{
 		UserService:     userService,
 		FollowerService: followService,
 	}
 }
 
 // InitRouter register handlers to gin.RouterGroup
-func (u *UserController) InitRouter(g *gin.RouterGroup) {
+func (u *userController) InitRouter(g *gin.RouterGroup) {
 	g.POST("/register/", u.Register)
 	g.POST("/login/", u.Login)
 	g.GET("/", u.Info)
 }
 
-func (u *UserController) Register(c *gin.Context) {
+func (u *userController) Register(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
 
@@ -53,14 +53,14 @@ func (u *UserController) Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, UserLoginResponse{
+	c.JSON(http.StatusOK, loginResponse{
 		Response: controller.ResponseOK(),
 		UserID:   token.ID,
 		Token:    token.Token,
 	})
 }
 
-func (u *UserController) Login(c *gin.Context) {
+func (u *userController) Login(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
 
@@ -70,14 +70,14 @@ func (u *UserController) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, UserLoginResponse{
+	c.JSON(http.StatusOK, loginResponse{
 		Response: controller.ResponseOK(),
 		UserID:   token.ID,
 		Token:    token.Token,
 	})
 }
 
-func (u *UserController) Info(c *gin.Context) {
+func (u *userController) Info(c *gin.Context) {
 	token := c.Query("token")
 	sQueryID := c.Query("user_id")
 
@@ -93,13 +93,13 @@ func (u *UserController) Info(c *gin.Context) {
 		return
 	}
 
-	userInfo, err := u.UserService.GetUserInfo(userID, queryID)
+	userInfo, err := u.UserService.GetUserInfo(&userID, queryID)
 	if err != nil {
 		c.JSON(http.StatusOK, controller.ResponseError(err))
 		return
 	}
 
-	c.JSON(http.StatusOK, UserInfoResponse{
+	c.JSON(http.StatusOK, infoResponse{
 		Response: controller.ResponseOK(),
 		UserInfo: *userInfo,
 	})

@@ -6,7 +6,7 @@
 
 Thanks to the following developers for their support of the project. (In no particular order)
 
-[@zhihaop](https://github.com/zhihaop), [@northmachine](https://github.com/northmachine), 
+[@zhihaop](https://github.com/zhihaop), [@northmachine](https://github.com/northmachine),
 [@JukieChen](https://github.com/JukieChen), [@WYAOBO](https://github.com/WYAOBO), [@xjmxyt](https://github.com/xjmxyt)
 
 ## Quick Start
@@ -28,17 +28,21 @@ into domains according to business requirements.
 │   ├───controller
 │   ├───repository
 │   └───service
-├───core
-├───entity              // entities (domains) of the application and their mocks
-│   └───mocks
-├───favourite           // favourite (user to video) domain
-├───follow              // follow (user to user) domain
-│   └───repository
-├───publish             // short-video publish domain
+├───core                // common utils or interfaces
 │   ├───controller
 │   ├───repository
 │   └───service
-└───user                // user manage domain
+├───entity              // entities (domains) of the application and their mocks
+│   └───mocks
+├───favourite           // favourite (user to video) domain
+│   ├───controller
+│   ├───repository
+│   └───service
+├───clip                // clip's domain
+│   ├───controller
+│   ├───repository
+│   └───service
+└───user                // user's domain
     ├───controller
     ├───repository
     └───service

@@ -2,7 +2,7 @@ package mocks
 
 import (
 	"github.com/zhihaop/ticktok/entity"
-	"github.com/zhihaop/ticktok/follow/service"
+	"github.com/zhihaop/ticktok/user/service"
 )
 
 // MockFollowService provides a mock service for FollowService
@@ -11,7 +11,7 @@ type MockFollowService struct {
 }
 
 func NewMockFollowService() entity.FollowService {
-	return &follow_service.FollowServiceImpl{
+	return &user_service.FollowServiceImpl{
 		FollowRepository: NewMockFollowRepository(),
 		UserRepository:   NewMockUserRepository(),
 	}

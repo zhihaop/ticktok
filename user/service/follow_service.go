@@ -1,4 +1,4 @@
-package follow_service
+package user_service
 
 import (
 	"github.com/zhihaop/ticktok/core/service"
@@ -6,21 +6,21 @@ import (
 	"math"
 )
 
-// FollowServiceImpl is an implementation of FollowService
-type FollowServiceImpl struct {
+// followServiceImpl is an implementation of FollowService
+type followServiceImpl struct {
 	entity.UserService
 	FollowRepository entity.FollowRepository
 	UserRepository   entity.UserRepository
 }
 
 func NewFollowService(followRepository entity.FollowRepository, userRepository entity.UserRepository) entity.FollowService {
-	return &FollowServiceImpl{
+	return &followServiceImpl{
 		FollowRepository: followRepository,
 		UserRepository:   userRepository,
 	}
 }
 
-func (u *FollowServiceImpl) HasFollow(followerID int64, followID int64) (bool, error) {
+func (u *followServiceImpl) HasFollow(followerID int64, followID int64) (bool, error) {
 	if followerID == followID {
 		return false, nil
 	}
@@ -32,7 +32,7 @@ func (u *FollowServiceImpl) HasFollow(followerID int64, followID int64) (bool, e
 	return hasFollow, nil
 }
 
-func (u *FollowServiceImpl) checkUser(id int64) (bool, error) {
+func (u *followServiceImpl) checkUser(id int64) (bool, error) {
 	user, err := u.UserRepository.FindByID(id)
 	if err != nil {
 		return false, err
@@ -40,8 +40,8 @@ func (u *FollowServiceImpl) checkUser(id int64) (bool, error) {
 	return user != nil, nil
 }
 
-func (u *FollowServiceImpl) ListFollow(userID int64) ([]entity.UserInfo, error) {
-	follow, err := u.FollowRepository.FetchFollow(userID, 0, math.MaxInt)
+func (u *followServiceImpl) ListFollow(userID int64, queryID int64) ([]entity.UserInfo, error) {
+	follow, err := u.FollowRepository.FetchFollow(queryID, 0, math.MaxInt)
 	if err != nil {
 		return nil, err
 	}
@@ -63,19 +63,24 @@ func (u *FollowServiceImpl) ListFollow(userID int64) ([]entity.UserInfo, error) 
 			return nil, err
 		}
 
+		hasFollow, err := u.HasFollow(userID, follow[i].FollowID)
+		if err != nil {
+			return nil, err
+		}
+
 		users[i] = entity.UserInfo{
 			ID:            follow[i].FollowID,
 			Name:          user.Name,
 			FollowerCount: followerCount,
 			FollowCount:   followCount,
-			IsFollow:      true,
+			IsFollow:      hasFollow,
 		}
 	}
 	return users, nil
 }
 
-func (u *FollowServiceImpl) ListFollower(userID int64) ([]entity.UserInfo, error) {
-	follow, err := u.FollowRepository.FetchFollower(userID, 0, math.MaxInt)
+func (u *followServiceImpl) ListFollower(userID int64, queryID int64) ([]entity.UserInfo, error) {
+	follow, err := u.FollowRepository.FetchFollower(queryID, 0, math.MaxInt)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +118,7 @@ func (u *FollowServiceImpl) ListFollower(userID int64) ([]entity.UserInfo, error
 	return users, nil
 }
 
-func (u *FollowServiceImpl) Follow(followerID int64, followID int64) error {
+func (u *followServiceImpl) Follow(followerID int64, followID int64) error {
 	if followID == followerID {
 		return service.ErrSelfFollowing
 	}
@@ -144,7 +149,7 @@ func (u *FollowServiceImpl) Follow(followerID int64, followID int64) error {
 	return nil
 }
 
-func (u *FollowServiceImpl) UnFollow(followerID int64, followID int64) error {
+func (u *followServiceImpl) UnFollow(followerID int64, followID int64) error {
 	if followID == followerID {
 		return service.ErrSelfUnFollowing
 	}
@@ -175,7 +180,7 @@ func (u *FollowServiceImpl) UnFollow(followerID int64, followID int64) error {
 	return nil
 }
 
-func (u *FollowServiceImpl) GetFollowerCount(id int64) (int64, error) {
+func (u *followServiceImpl) GetFollowerCount(id int64) (int64, error) {
 	followerCount, err := u.FollowRepository.CountFollowerByID(id)
 	if err != nil {
 		return 0, service.ErrInternalServerError
@@ -183,7 +188,7 @@ func (u *FollowServiceImpl) GetFollowerCount(id int64) (int64, error) {
 	return followerCount, nil
 }
 
-func (u *FollowServiceImpl) GetFollowCount(id int64) (int64, error) {
+func (u *followServiceImpl) GetFollowCount(id int64) (int64, error) {
 	followingCount, err := u.FollowRepository.CountFollowByID(id)
 	if err != nil {
 		return 0, service.ErrInternalServerError

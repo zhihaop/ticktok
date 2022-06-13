@@ -1,4 +1,4 @@
-package publish_controller
+package clip_controller
 
 import (
 	"github.com/gin-gonic/gin"
@@ -9,30 +9,30 @@ import (
 	"strconv"
 )
 
-type PublishController struct {
+type publishControllerImpl struct {
 	controller.Controller
-	PublishService entity.PublishService
+	PublishService entity.ClipService
 	UserService    entity.UserService
 }
 
-type VideoInfoResponse struct {
+type clipInfoResponse struct {
 	controller.Response
-	VideoList []entity.VideoInfo `json:"video_list"`
+	VideoList []entity.ClipInfo `json:"video_list"`
 }
 
-func (p *PublishController) InitRouter(g *gin.RouterGroup) {
+func (p *publishControllerImpl) InitRouter(g *gin.RouterGroup) {
 	g.POST("/action/", p.Action)
 	g.GET("/list/", p.List)
 }
 
-func NewPublishController(publishService entity.PublishService, userService entity.UserService) controller.Controller {
-	return &PublishController{
+func NewPublishController(publishService entity.ClipService, userService entity.UserService) controller.Controller {
+	return &publishControllerImpl{
 		PublishService: publishService,
 		UserService:    userService,
 	}
 }
 
-func (p *PublishController) Action(c *gin.Context) {
+func (p *publishControllerImpl) Action(c *gin.Context) {
 	data, err := c.FormFile("data")
 	if err != nil {
 		c.JSON(http.StatusOK, controller.ResponseError(err))
@@ -65,7 +65,7 @@ func (p *PublishController) Action(c *gin.Context) {
 	c.JSON(http.StatusOK, controller.ResponseOK())
 }
 
-func (p *PublishController) List(c *gin.Context) {
+func (p *publishControllerImpl) List(c *gin.Context) {
 	token := c.Query("token")
 	sUserID := c.Query("user_id")
 
@@ -86,7 +86,7 @@ func (p *PublishController) List(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, VideoInfoResponse{
+	c.JSON(http.StatusOK, clipInfoResponse{
 		Response:  controller.ResponseOK(),
 		VideoList: result,
 	})

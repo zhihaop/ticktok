@@ -5,7 +5,7 @@ import (
 	user_service "github.com/zhihaop/ticktok/user/service"
 )
 
-// MockUserService provides a mock service for UserService
+// MockUserService provides a mock service for us
 type MockUserService struct {
 	entity.UserService
 }
