@@ -21,7 +21,7 @@ var (
 	ErrSelfUnFollowing  = errors.New("action unfollow failed: self following")
 )
 
-// PushService error type
+// ClipService error type
 var (
 	ErrVideoFileInValid = errors.New("the uploaded video file is invalid")
 )

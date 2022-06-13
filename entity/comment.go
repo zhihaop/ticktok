@@ -8,7 +8,7 @@ import (
 type Comment struct {
 	ID       int64 `gorm:"autoIncrement"`
 	UserID   int64
-	VideoID  int64
+	ClipID   int64
 	Content  string
 	CreateAt time.Time
 	UpdateAt time.Time

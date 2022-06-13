@@ -10,8 +10,8 @@ import (
 	"log"
 )
 
-// UserServiceImpl is an implementation of UserService
-type UserServiceImpl struct {
+// userServiceImpl is an implementation of us
+type userServiceImpl struct {
 	userRepository   entity.UserRepository
 	followRepository entity.FollowRepository
 }
@@ -22,15 +22,15 @@ type Token struct {
 	UUID string `json:"UUID"`
 }
 
-// NewUserService creates and initializes an instance of UserServiceImpl
+// NewUserService creates and initializes an instance of userServiceImpl
 func NewUserService(userRepository entity.UserRepository, followRepository entity.FollowRepository) entity.UserService {
-	return &UserServiceImpl{
+	return &userServiceImpl{
 		userRepository:   userRepository,
 		followRepository: followRepository,
 	}
 }
 
-func (u *UserServiceImpl) GetUserInfo(userID int64, queryID int64) (*entity.UserInfo, error) {
+func (u *userServiceImpl) GetUserInfo(userID *int64, queryID int64) (*entity.UserInfo, error) {
 	username, err := u.GetUsername(queryID)
 	if err != nil {
 		return nil, err
@@ -46,9 +46,13 @@ func (u *UserServiceImpl) GetUserInfo(userID int64, queryID int64) (*entity.User
 		return nil, err
 	}
 
-	hasFollow, err := u.followRepository.HasFollow(userID, queryID)
-	if err != nil {
-		return nil, err
+	hasFollow := false
+	if userID != nil && *userID != queryID {
+		result, err := u.followRepository.HasFollow(*userID, queryID)
+		if err != nil {
+			return nil, err
+		}
+		hasFollow = result
 	}
 
 	return &entity.UserInfo{
@@ -85,7 +89,7 @@ func DecodeToken(s string) (Token, error) {
 	return token, nil
 }
 
-func (u *UserServiceImpl) Register(username string, password string) (*entity.UserLoginToken, error) {
+func (u *userServiceImpl) Register(username string, password string) (*entity.UserLoginToken, error) {
 	// the length of username should in range [5, 32]
 	if len(username) < 5 || len(username) > 32 {
 		return nil, service.ErrUsernameLengthInvalid
@@ -112,7 +116,7 @@ func (u *UserServiceImpl) Register(username string, password string) (*entity.Us
 	return u.Login(username, password)
 }
 
-func (u *UserServiceImpl) Login(username string, password string) (*entity.UserLoginToken, error) {
+func (u *userServiceImpl) Login(username string, password string) (*entity.UserLoginToken, error) {
 	user, err := u.userRepository.FindByUsername(username)
 	if err != nil {
 		log.Printf("Login(...): %s\n", errors.Details(err))
@@ -134,7 +138,7 @@ func (u *UserServiceImpl) Login(username string, password string) (*entity.UserL
 	return &entity.UserLoginToken{ID: user.ID, Token: tokenString}, nil
 }
 
-func (u *UserServiceImpl) GetUsername(id int64) (string, error) {
+func (u *userServiceImpl) GetUsername(id int64) (string, error) {
 	user, err := u.userRepository.FindByID(id)
 	if err != nil {
 		log.Printf("GetUsername(...): %s\n", errors.Details(err))
@@ -145,7 +149,7 @@ func (u *UserServiceImpl) GetUsername(id int64) (string, error) {
 	return user.Name, nil
 }
 
-func (u *UserServiceImpl) GetUserID(token string) (int64, error) {
+func (u *userServiceImpl) GetUserID(token string) (int64, error) {
 	user, err := u.userRepository.FindByToken(token)
 	if err != nil {
 		log.Printf("GetUserID(...): %s\n", errors.Details(err))

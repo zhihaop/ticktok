@@ -1,4 +1,4 @@
-package follow_repository
+package user_repository
 
 import (
 	utils "github.com/zhihaop/ticktok/core/repository"
@@ -8,13 +8,13 @@ import (
 	"log"
 )
 
-// FollowRepositoryImpl is an implementation of FollowRepository
-type FollowRepositoryImpl struct {
+// followRepositoryImpl is an implementation of FollowRepository
+type followRepositoryImpl struct {
 	entity.FollowRepository
 	db *gorm.DB
 }
 
-func (f *FollowRepositoryImpl) FetchFollow(followerID int64, offset int, limit int) ([]entity.Follow, error) {
+func (f *followRepositoryImpl) FetchFollow(followerID int64, offset int, limit int) ([]entity.Follow, error) {
 	follows := make([]entity.Follow, 0)
 	query := f.db.Model(&entity.Follow{})
 
@@ -25,7 +25,7 @@ func (f *FollowRepositoryImpl) FetchFollow(followerID int64, offset int, limit i
 	return follows, nil
 }
 
-func (f *FollowRepositoryImpl) FetchFollower(followID int64, offset int, limit int) ([]entity.Follow, error) {
+func (f *followRepositoryImpl) FetchFollower(followID int64, offset int, limit int) ([]entity.Follow, error) {
 	follows := make([]entity.Follow, 0)
 	query := f.db.Model(&entity.Follow{})
 
@@ -40,10 +40,10 @@ func NewFollowRepository(db *gorm.DB) entity.FollowRepository {
 	if err := utils.CheckOrCreateTable(db, &entity.Follow{}); err != nil {
 		log.Fatalln(err)
 	}
-	return &FollowRepositoryImpl{db: db}
+	return &followRepositoryImpl{db: db}
 }
 
-func (f *FollowRepositoryImpl) CountFollowerByID(followID int64) (int64, error) {
+func (f *followRepositoryImpl) CountFollowerByID(followID int64) (int64, error) {
 	followerCount := int64(0)
 	db := f.db.Model(&entity.Follow{}).Where("follow_id = ?", followID).Count(&followerCount)
 	if db.Error != nil {
@@ -52,7 +52,7 @@ func (f *FollowRepositoryImpl) CountFollowerByID(followID int64) (int64, error) 
 	return followerCount, nil
 }
 
-func (f *FollowRepositoryImpl) CountFollowByID(followerID int64) (int64, error) {
+func (f *followRepositoryImpl) CountFollowByID(followerID int64) (int64, error) {
 	followCount := int64(0)
 	db := f.db.Model(&entity.Follow{}).Where("follower_id = ?", followerID).Count(&followCount)
 	if db.Error != nil {
@@ -61,7 +61,7 @@ func (f *FollowRepositoryImpl) CountFollowByID(followerID int64) (int64, error) 
 	return followCount, nil
 }
 
-func (f *FollowRepositoryImpl) InsertFollow(followerID int64, followID int64) error {
+func (f *followRepositoryImpl) InsertFollow(followerID int64, followID int64) error {
 	db := f.db.Save(&entity.Follow{
 		FollowerID: followerID,
 		FollowID:   followID,
@@ -72,7 +72,7 @@ func (f *FollowRepositoryImpl) InsertFollow(followerID int64, followID int64) er
 	return nil
 }
 
-func (f *FollowRepositoryImpl) DeleteFollow(followerID int64, followID int64) error {
+func (f *followRepositoryImpl) DeleteFollow(followerID int64, followID int64) error {
 	db := f.db.Where("follower_id = ? AND follow_id = ?", followerID, followID).Delete(&entity.Follow{})
 	if db.Error != nil {
 		return db.Error
@@ -80,7 +80,7 @@ func (f *FollowRepositoryImpl) DeleteFollow(followerID int64, followID int64) er
 	return nil
 }
 
-func (f *FollowRepositoryImpl) HasFollow(followerID int64, followID int64) (bool, error) {
+func (f *followRepositoryImpl) HasFollow(followerID int64, followID int64) (bool, error) {
 	count := int64(0)
 	db := f.db.Model(&entity.Follow{}).Where("follower_id = ? AND follow_id = ?", followerID, followID).Count(&count)
 	if db.Error != nil {

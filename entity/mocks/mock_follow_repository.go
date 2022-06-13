@@ -2,7 +2,7 @@ package mocks
 
 import (
 	"github.com/zhihaop/ticktok/entity"
-	"github.com/zhihaop/ticktok/follow/repository"
+	"github.com/zhihaop/ticktok/user/repository"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"log"
@@ -18,6 +18,6 @@ func NewMockFollowRepository() entity.FollowRepository {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	mock := &MockFollowRepository{follow_repository.NewFollowRepository(db)}
+	mock := &MockFollowRepository{user_repository.NewFollowRepository(db)}
 	return mock
 }

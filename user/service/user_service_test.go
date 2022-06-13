@@ -5,6 +5,7 @@ import (
 	"github.com/zhihaop/ticktok/entity"
 	"github.com/zhihaop/ticktok/entity/mocks"
 	"github.com/zhihaop/ticktok/user/service"
+
 	"testing"
 )
 
@@ -13,6 +14,7 @@ var userService entity.UserService
 func init() {
 	userService = user_service.NewUserService(
 		mocks.NewMockUserRepository(),
+		mocks.NewMockFollowRepository(),
 	)
 }
 

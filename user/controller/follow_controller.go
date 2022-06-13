@@ -1,4 +1,4 @@
-package follow_controller
+package user_controller
 
 import (
 	"github.com/gin-gonic/gin"
@@ -14,8 +14,8 @@ const (
 	ActionUnfollow = "2"
 )
 
-// FollowController handles all the request mapping to '/douyin/relation'
-type FollowController struct {
+// followController handles all the request mapping to '/douyin/relation'
+type followController struct {
 	controller.Controller
 	UserService   entity.UserService
 	FollowService entity.FollowService
@@ -26,22 +26,22 @@ type followListResponse struct {
 	UserList []entity.UserInfo `json:"user_list"`
 }
 
-// NewFollowController creates an instance of FollowController
+// NewFollowController creates an instance of followController
 func NewFollowController(userService entity.UserService, followService entity.FollowService) controller.Controller {
-	return &FollowController{
+	return &followController{
 		UserService:   userService,
 		FollowService: followService,
 	}
 }
 
 // InitRouter register handlers to gin.RouterGroup
-func (u *FollowController) InitRouter(g *gin.RouterGroup) {
+func (u *followController) InitRouter(g *gin.RouterGroup) {
 	g.POST("/action/", u.Action)
 	g.GET("/follow/list/", u.ListFollow)
 	g.GET("/follower/list/", u.ListFollower)
 }
 
-func (u *FollowController) Action(g *gin.Context) {
+func (u *followController) Action(g *gin.Context) {
 	token := g.Query("token")
 	sFollowID := g.Query("to_user_id")
 	sAction := g.Query("action_type")
@@ -77,7 +77,7 @@ func (u *FollowController) Action(g *gin.Context) {
 	g.JSON(http.StatusOK, controller.ResponseOK())
 }
 
-func (u *FollowController) ListFollow(g *gin.Context) {
+func (u *followController) ListFollow(g *gin.Context) {
 	sUserID := g.Query("user_id")
 	token := g.Query("token")
 
@@ -97,7 +97,7 @@ func (u *FollowController) ListFollow(g *gin.Context) {
 		userID = id
 	}
 
-	follows, err := u.FollowService.ListFollow(userID)
+	follows, err := u.FollowService.ListFollow(id, userID)
 	if err != nil {
 		g.JSON(http.StatusOK, controller.ResponseError(err))
 		return
@@ -109,7 +109,7 @@ func (u *FollowController) ListFollow(g *gin.Context) {
 	})
 }
 
-func (u *FollowController) ListFollower(g *gin.Context) {
+func (u *followController) ListFollower(g *gin.Context) {
 	sUserID := g.Query("user_id")
 	token := g.Query("token")
 
@@ -129,7 +129,7 @@ func (u *FollowController) ListFollower(g *gin.Context) {
 		userID = id
 	}
 
-	followers, err := u.FollowService.ListFollower(userID)
+	followers, err := u.FollowService.ListFollower(id, userID)
 	if err != nil {
 		g.JSON(http.StatusOK, controller.ResponseError(err))
 		return
