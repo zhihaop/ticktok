@@ -13,6 +13,22 @@ type publishRepositoryImpl struct {
 	db *gorm.DB
 }
 
+func (p *publishRepositoryImpl) GetByID(clipID int64) (*entity.Clip, error) {
+	clip := make([]entity.Clip, 0)
+	if err := p.db.Model(&entity.Clip{}).Where("id = ?", clipID).Find(&clip).Error; err != nil {
+		return nil, err
+	}
+	return &clip[0], nil
+}
+
+func (p *publishRepositoryImpl) HasClip(clipID int64) (bool, error) {
+	count := int64(0)
+	if err := p.db.Model(&entity.Clip{}).Where("id = ?", clipID).Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count != 0, nil
+}
+
 func (p *publishRepositoryImpl) FetchByID(userID int64, limit int, offset time.Time) ([]entity.Clip, error) {
 	clips := make([]entity.Clip, 0)
 	table := p.db.Model(&entity.Clip{})
@@ -46,7 +62,7 @@ func (p *publishRepositoryImpl) Save(Clip *entity.Clip) error {
 	return p.db.Save(&Clip).Error
 }
 
-func NewPublishRepository(db *gorm.DB) entity.ClipRepository {
+func NewClipRepository(db *gorm.DB) entity.ClipRepository {
 	if err := repository.CheckOrCreateTable(db, &entity.Clip{}); err != nil {
 		log.Fatalln(err)
 	}
