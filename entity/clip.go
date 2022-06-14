@@ -32,6 +32,9 @@ type ClipService interface {
 	Publish(userID int64, title string, dataLength int64, reader io.Reader) error
 	List(userID int64) ([]ClipInfo, error)
 	Fetch(userID *int64, limit int, offset time.Time) ([]ClipInfo, error)
+	GetVideoInfos(userID *int64, clips []Clip) ([]ClipInfo, error)
+	HasClip(clipID int64) (bool, error)
+	GetByID(userID *int64, clipID int64) (*ClipInfo, error)
 }
 
 // ClipRepository represents the repository for clips
@@ -40,4 +43,6 @@ type ClipRepository interface {
 	Fetch(limit int, offset time.Time) ([]Clip, error)
 	Save(video *Clip) error
 	HasUUID(uuid string) (bool, error)
+	HasClip(clipID int64) (bool, error)
+	GetByID(clipID int64) (*Clip, error)
 }

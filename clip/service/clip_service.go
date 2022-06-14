@@ -17,23 +17,48 @@ import (
 const httpPrefix = "http"
 
 type clipServiceImpl struct {
-	publishRepository entity.ClipRepository
-	userService       entity.UserService
-	address           string
+	clipRepository entity.ClipRepository
+	userService    entity.UserService
+	address        string
 }
 
-func NewClipService(publishRepository entity.ClipRepository, userService entity.UserService) entity.ClipService {
-	return &clipServiceImpl{
-		publishRepository: publishRepository,
-		userService:       userService,
-		address:           viper.GetString("server.address"),
+func (p *clipServiceImpl) GetByID(userID *int64, clipID int64) (*entity.ClipInfo, error) {
+	clip, err := p.clipRepository.GetByID(clipID)
+	if err != nil {
+		return nil, service.ErrInternalServerError
+	} else if clip == nil {
+		return nil, nil
 	}
+
+	infos, err := p.GetVideoInfos(userID, []entity.Clip{*clip})
+	if err != nil {
+		return nil, err
+	} else if len(infos) == 0 {
+		return nil, nil
+	}
+	return &infos[0], err
+}
+
+func NewClipService(clipRepository entity.ClipRepository, userService entity.UserService) entity.ClipService {
+	return &clipServiceImpl{
+		clipRepository: clipRepository,
+		userService:    userService,
+		address:        viper.GetString("server.address"),
+	}
+}
+
+func (p *clipServiceImpl) HasClip(clipID int64) (bool, error) {
+	exist, err := p.clipRepository.HasClip(clipID)
+	if err != nil {
+		return false, service.ErrInternalServerError
+	}
+	return exist, nil
 }
 
 func (p *clipServiceImpl) Store(uuid string, dataLength int64, reader io.Reader) error {
 	file, err := os.OpenFile(filepath.Join("resources", uuid), os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		return err
+		return service.ErrInternalServerError
 	}
 	defer func(file *os.File) {
 		err := file.Close()
@@ -46,14 +71,14 @@ func (p *clipServiceImpl) Store(uuid string, dataLength int64, reader io.Reader)
 	for {
 		read, err := reader.Read(buffer)
 		if err != nil && err != io.EOF {
-			return err
+			return service.ErrInternalServerError
 		}
 		if read == 0 {
 			break
 		}
 		_, err = file.Write(buffer[0:read])
 		if err != nil {
-			return err
+			return service.ErrInternalServerError
 		}
 		dataLength = dataLength - int64(read)
 	}
@@ -67,7 +92,7 @@ func (p *clipServiceImpl) Store(uuid string, dataLength int64, reader io.Reader)
 func (p *clipServiceImpl) GetUUID() (string, error) {
 	for retry := 0; retry < 16; retry++ {
 		uuid := core.GetUUID()
-		exist, err := p.publishRepository.HasUUID(uuid)
+		exist, err := p.clipRepository.HasUUID(uuid)
 		if err != nil {
 			return "", service.ErrInternalServerError
 		} else if !exist {
@@ -87,7 +112,7 @@ func (p *clipServiceImpl) Publish(userID int64, title string, dataLength int64, 
 		return err
 	}
 
-	if err := p.publishRepository.Save(&entity.Clip{
+	if err := p.clipRepository.Save(&entity.Clip{
 		UserID:    userID,
 		Title:     title,
 		ClipUUID:  uuid,
@@ -106,7 +131,7 @@ func (p *clipServiceImpl) GetVideoInfos(userID *int64, clips []entity.Clip) ([]e
 		infos[i].ID = clips[i].ID
 
 		infos[i].PlayURL = fmt.Sprintf("%s://%s/douyin/static/%s", httpPrefix, p.address, clips[i].ClipUUID)
-		infos[i].CoverURL = fmt.Sprintf("%s://%s//douyin/static/%s", httpPrefix, p.address, clips[i].ClipUUID)
+		infos[i].CoverURL = fmt.Sprintf("%s://%s/douyin/static/%s", httpPrefix, p.address, clips[i].ClipUUID)
 
 		// TODO implement comment repository
 		infos[i].CommentCount = 0
@@ -125,7 +150,7 @@ func (p *clipServiceImpl) GetVideoInfos(userID *int64, clips []entity.Clip) ([]e
 }
 
 func (p *clipServiceImpl) List(userID int64) ([]entity.ClipInfo, error) {
-	clips, err := p.publishRepository.FetchByID(userID, math.MaxInt, time.Now())
+	clips, err := p.clipRepository.FetchByID(userID, math.MaxInt, time.Now())
 	if err != nil {
 		return nil, service.ErrInternalServerError
 	}
@@ -134,7 +159,7 @@ func (p *clipServiceImpl) List(userID int64) ([]entity.ClipInfo, error) {
 }
 
 func (p *clipServiceImpl) Fetch(userID *int64, limit int, offset time.Time) ([]entity.ClipInfo, error) {
-	clips, err := p.publishRepository.Fetch(limit, offset)
+	clips, err := p.clipRepository.Fetch(limit, offset)
 	if err != nil {
 		return nil, service.ErrInternalServerError
 	}
